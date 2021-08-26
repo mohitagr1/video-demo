@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.example.demo.dao.AdMediaRepository;
 import com.example.demo.dao.VideoRepository;
 import com.example.demo.model.AdMedia;
 import com.example.demo.model.Video;
@@ -17,36 +19,23 @@ public class VideoServiceImpl implements VideoService{
     @Autowired
     private VideoRepository videoRepository;
 
+    @Autowired
+    private AdMediaRepository adMediaRepository;
+
+    @Autowired
+    private AWSS3Service awss3Service;
+
     @Override
     public Video saveVideo(String title, String description, MultipartFile file) {
-        if (file.isEmpty()) {
-            throw new IllegalStateException("Cannot upload empty file");
-        }
-        Map<String, String> metadata = new HashMap<>();
-        metadata.put("Content-Type", file.getContentType());
-        metadata.put("Content-Length", String.valueOf(file.getSize()));
 
-        String fileName = String.format("%s", file.getOriginalFilename());
-
-        String rootPath = System.getProperty("user.dir");
-        File dir = new File(rootPath + File.separator + "digiwebapp"+File.separator+"res"+File.separator+"video");
-        if (!dir.exists())
-            dir.mkdirs();
-
-
-        File f1 = new File(dir+"/"+file.getOriginalFilename());
-        try {
-            file.transferTo(f1);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String location = "videos/"+String.valueOf(System.currentTimeMillis())+"_";
+        String url = awss3Service.uploadFile(file, location);
 
         Video.VideoBuilder videoBuilder= Video.builder();
         Video video = videoBuilder
                 .description(description)
                 .title(title)
-                .filePath("path")
-                .fileName(fileName)
+                .videoURL(url)
                 .build();
         videoRepository.save(video);
         return videoRepository.findById(video.getId()).orElse(null);
@@ -61,7 +50,25 @@ public class VideoServiceImpl implements VideoService{
 
     @Override
     public AdMedia addMedia(Long id, Long timestamp, String title, String link, MultipartFile file) {
-        return null;
+
+        String location = "media/"+String.valueOf(System.currentTimeMillis())+"_";
+        String url = awss3Service.uploadFile(file, location);
+
+        AdMedia.AdMediaBuilder adMediaBuilder= AdMedia.builder();
+        AdMedia adMedia = adMediaBuilder
+                .videoId(id)
+                .Title(title)
+                .timestamp(timestamp)
+                .link(link)
+                .mediaURL(url)
+                .build();
+        adMediaRepository.save(adMedia);
+        return adMediaRepository.findById(adMedia.getId()).orElse(null);
+    }
+
+    @Override
+    public List<AdMedia> getAllMedia(Long videoId) {
+        return adMediaRepository.findAllByVideoId(videoId);
     }
 //    @Autowired
 //    private HostelRepo hostelRepo;

@@ -42,7 +42,7 @@ public class VideoController {
         return new ResponseEntity<>(videoService.saveVideo(title, description, file), HttpStatus.OK);
     }
 
-    @PostMapping(value = "{id}/media",
+    @PostMapping(value = "{id}/addMedia",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -53,6 +53,11 @@ public class VideoController {
             @RequestParam("link") String link,
             @RequestParam("file") MultipartFile file) {
         return new ResponseEntity<>(videoService.addMedia(id,timestamp,title ,link, file), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "{id}/getAllMedia")
+    public ResponseEntity<List<AdMedia>> getAllMedia(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(videoService.getAllMedia(id), HttpStatus.OK);
     }
 
 //    @GetMapping(path = "/getAll")

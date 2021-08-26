@@ -14,4 +14,6 @@ public interface VideoService {
     List<Video> getAllVideos();
 
     AdMedia addMedia(Long id, Long timestamp, String title, String link, MultipartFile file);
+
+    List<AdMedia> getAllMedia(Long id);
 }

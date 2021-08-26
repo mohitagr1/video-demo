@@ -2,6 +2,7 @@ package com.example.demo.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
@@ -11,6 +12,7 @@ import javax.persistence.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Data
 @Builder
 public class AdMedia {
     @Id
@@ -20,7 +22,6 @@ public class AdMedia {
     private Long timestamp;
     private String Title;
     private String link;
-    private String filePath;
-    private String fileName;
+    private String mediaURL;
 
 }
